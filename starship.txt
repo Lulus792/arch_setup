@@ -1,0 +1,84 @@
+# ---------------------------------------------------
+# Colorful, modern Starship prompt config
+# ---------------------------------------------------
+
+# GENERAL SETTINGS
+format = """
+[](#6C63FF)\
+$directory\
+[](fg:#6C63FF bg:#00C8FF)\
+$git_branch$git_status\
+[](fg:#00C8FF bg:#00F0A8)\
+$nodejs$rust$go$python\
+[](fg:#00F0A8 bg:#303030)\
+$cmd_duration\
+[](fg:#303030)
+$character
+"""
+
+add_newline = true
+
+# PROMPT CHARACTER
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"
+vicmd_symbol   = "[❮](bold yellow)"
+
+# DIRECTORY MODULE
+[directory]
+style = "bold #FFFFFF bg:#6C63FF"
+format = "[ $path ]($style)"
+truncate_to_repo = true
+truncation_length = 3
+truncation_symbol = "…/"
+
+# GIT BRANCH
+[git_branch]
+symbol = " "
+style = "bold #FFFFFF bg:#00C8FF"
+format = "[ $symbol$branch ]($style)"
+
+# GIT STATUS
+[git_status]
+style = "bold #FFFFFF bg:#00C8FF"
+format = "[($all_status$ahead_behind )]($style)"
+
+# COMMAND DURATION
+[cmd_duration]
+min_time = 50
+style = "bold #FFFFFF bg:#303030"
+format = "[  $duration ]($style)"
+
+# PROGRAMMING LANGUAGES
+[nodejs]
+symbol = " "
+style = "bold #000000 bg:#00F0A8"
+format = "[ $symbol($version) ]($style)"
+
+[rust]
+symbol = "🦀 "
+style = "bold #000000 bg:#00F0A8"
+format = "[ $symbol($version) ]($style)"
+
+[python]
+symbol = " "
+style = "bold #000000 bg:#00F0A8"
+format = "[ $symbol($version) ]($style)"
+
+[go]
+symbol = " "
+style = "bold #000000 bg:#00F0A8"
+format = "[ $symbol($version) ]($style)"
+
+# Disable things you don’t use
+[package]
+disabled = true
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[docker_context]
+disabled = true
