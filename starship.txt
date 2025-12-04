@@ -4,65 +4,68 @@ set -g mouse on
 setw -g mode-keys vi
 set -g default-terminal "tmux-256color"
 
-##### COLOR PALETTE (Blue → Violet) #####
-set -g @color_bg        "#1A1C2C"
-set -g @color_fg        "#CCD6FF"
-set -g @color_blue      "#4C6EF5"
-set -g @color_peri      "#748FFC"
-set -g @color_lav       "#9775FA"
-set -g @color_purple    "#B197FC"
+##### COLORS #####
+set -g @color_bg  "#1A1C2C"
+set -g @color_fg  "#CCD6FF"
 
-##### POWERLINE SEPARATORS #####
-set -g @sep_left_bold ""
-set -g @sep_right_bold ""
+# Gradient colors
+set -g @grad1 "#3B5BDB"
+set -g @grad2 "#4C6EF5"
+set -g @grad3 "#5C7CFA"
+set -g @grad4 "#748FFC"
+set -g @grad5 "#9775FA"
+set -g @grad6 "#B197FC"
 
 ##### STATUS BAR #####
-
-# Bar at the top
-set -g status-position top
-
-# Bar background + font
+#set -g status-position top
 set -g status-bg "#{@color_bg}"
 set -g status-fg "#{@color_fg}"
 set -g status-interval 5
+set -g status-justify centre
 
-##### LEFT SIDE (Powerline + Session + CPU + MEM) #####
+##### LEFT SIDE (Gradient segments + Session + CPU & MEM) #####
 
 set -g status-left-length 200
-set -g status-left \
-"#[fg=#{@color_blue},bg=#{@color_bg}]#{@sep_left_bold}#[fg=#{@color_bg},bg=#{@color_blue},bold] #S #[fg=#{@color_blue},bg=#{@color_bg}]#{@sep_right_bold}\
- #[fg=#{@color_lav},bg=#{@color_bg}] #[fg=#{@color_fg}]CPU: #(awk '{u=$2+$4; t=$2+$4+$5} END {printf \"%.0f%%\", u/t*100}' /proc/stat) \
- #[fg=#{@color_peri},bg=#{@color_bg}] #[fg=#{@color_fg}]MEM: #(free | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') "
+set -g status-left "\
+#[bg=#{@grad1},fg=#{@color_bg}]  #S  \
+#[bg=#{@grad2},fg=#{@color_bg}]   #(awk '{u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", (u/t*100); else printf \"N/A\"}' /proc/stat)  \
+#[bg=#{@grad3},fg=#{@color_bg}]   #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}')  \
+#[bg=#{@color_bg}] "
 
-##### RIGHT SIDE (Battery + Powerline) #####
+##### RIGHT SIDE (Battery + Gradient) #####
 
-set -g status-right-length 80
-set -g status-right \
-"#[fg=#{@color_purple},bg=#{@color_bg}]#{@sep_left_bold}#[fg=#{@color_bg},bg=#{@color_purple}] 🔋 #(acpi -b | awk '{print $4}' | tr -d ',') #[fg=#{@color_purple},bg=#{@color_bg}]#{@sep_right_bold}"
+set -g status-right-length 200
+set -g status-right "\
+#[bg=#{@grad5},fg=#{@color_bg}] 🔋 #( (acpi -b 2>/dev/null | awk -F', ' '{print $2}') || echo 'N/A')  \
+#[bg=#{@grad6},fg=#{@color_bg}]  \
+#[fg=#{@color_fg},bg=#{@color_bg}] "
 
 ##### WINDOW LIST #####
-
 setw -g window-status-format " #I:#W "
-setw -g window-status-current-format "#[fg=#{@color_blue},bold] #I:#W "
+setw -g window-status-current-format "#[fg=#{@grad4},bold] #I:#W "
 
 ##### PANE BORDERS #####
-
-set -g pane-border-style "fg=#{@color_peri}"
-set -g pane-active-border-style "fg=#{@color_blue}"
+set -g pane-border-style "fg=#{@grad3}"
+set -g pane-active-border-style "fg=#{@grad2}"
 
 ##### KEYBINDINGS #####
 
-# Switch prefix from C-b → C-a (much better)
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
 
+# Move panes (hjkl)
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Resize with Shift + hjkl
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
 # Splits
 bind | split-window -h
 bind - split-window -v
-
-# Resize with vim keys
-bind -r h resize-pane -L 3
-bind -r j resize-pane -D 3
-bind -r k resize-pane -U 3
-bind -r l resize-pane -R 3
