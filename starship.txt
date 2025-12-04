@@ -1,84 +1,68 @@
-# ---------------------------------------------------
-# Colorful, modern Starship prompt config
-# ---------------------------------------------------
+##### GENERAL #####
+set -g history-limit 10000
+set -g mouse on
+setw -g mode-keys vi
+set -g default-terminal "tmux-256color"
 
-# GENERAL SETTINGS
-format = """
-[](#6C63FF)\
-$directory\
-[](fg:#6C63FF bg:#00C8FF)\
-$git_branch$git_status\
-[](fg:#00C8FF bg:#00F0A8)\
-$nodejs$rust$go$python\
-[](fg:#00F0A8 bg:#303030)\
-$cmd_duration\
-[](fg:#303030)
-$character
-"""
+##### COLOR PALETTE (Blue → Violet) #####
+set -g @color_bg        "#1A1C2C"
+set -g @color_fg        "#CCD6FF"
+set -g @color_blue      "#4C6EF5"
+set -g @color_peri      "#748FFC"
+set -g @color_lav       "#9775FA"
+set -g @color_purple    "#B197FC"
 
-add_newline = true
+##### POWERLINE SEPARATORS #####
+set -g @sep_left_bold ""
+set -g @sep_right_bold ""
 
-# PROMPT CHARACTER
-[character]
-success_symbol = "[❯](bold green)"
-error_symbol   = "[❯](bold red)"
-vicmd_symbol   = "[❮](bold yellow)"
+##### STATUS BAR #####
 
-# DIRECTORY MODULE
-[directory]
-style = "bold #FFFFFF bg:#6C63FF"
-format = "[ $path ]($style)"
-truncate_to_repo = true
-truncation_length = 3
-truncation_symbol = "…/"
+# Bar at the top
+set -g status-position top
 
-# GIT BRANCH
-[git_branch]
-symbol = " "
-style = "bold #FFFFFF bg:#00C8FF"
-format = "[ $symbol$branch ]($style)"
+# Bar background + font
+set -g status-bg "#{@color_bg}"
+set -g status-fg "#{@color_fg}"
+set -g status-interval 5
 
-# GIT STATUS
-[git_status]
-style = "bold #FFFFFF bg:#00C8FF"
-format = "[($all_status$ahead_behind )]($style)"
+##### LEFT SIDE (Powerline + Session + CPU + MEM) #####
 
-# COMMAND DURATION
-[cmd_duration]
-min_time = 50
-style = "bold #FFFFFF bg:#303030"
-format = "[  $duration ]($style)"
+set -g status-left-length 200
+set -g status-left \
+"#[fg=#{@color_blue},bg=#{@color_bg}]#{@sep_left_bold}#[fg=#{@color_bg},bg=#{@color_blue},bold] #S #[fg=#{@color_blue},bg=#{@color_bg}]#{@sep_right_bold}\
+ #[fg=#{@color_lav},bg=#{@color_bg}] #[fg=#{@color_fg}]CPU: #(awk '{u=$2+$4; t=$2+$4+$5} END {printf \"%.0f%%\", u/t*100}' /proc/stat) \
+ #[fg=#{@color_peri},bg=#{@color_bg}] #[fg=#{@color_fg}]MEM: #(free | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') "
 
-# PROGRAMMING LANGUAGES
-[nodejs]
-symbol = " "
-style = "bold #000000 bg:#00F0A8"
-format = "[ $symbol($version) ]($style)"
+##### RIGHT SIDE (Battery + Powerline) #####
 
-[rust]
-symbol = "🦀 "
-style = "bold #000000 bg:#00F0A8"
-format = "[ $symbol($version) ]($style)"
+set -g status-right-length 80
+set -g status-right \
+"#[fg=#{@color_purple},bg=#{@color_bg}]#{@sep_left_bold}#[fg=#{@color_bg},bg=#{@color_purple}] 🔋 #(acpi -b | awk '{print $4}' | tr -d ',') #[fg=#{@color_purple},bg=#{@color_bg}]#{@sep_right_bold}"
 
-[python]
-symbol = " "
-style = "bold #000000 bg:#00F0A8"
-format = "[ $symbol($version) ]($style)"
+##### WINDOW LIST #####
 
-[go]
-symbol = " "
-style = "bold #000000 bg:#00F0A8"
-format = "[ $symbol($version) ]($style)"
+setw -g window-status-format " #I:#W "
+setw -g window-status-current-format "#[fg=#{@color_blue},bold] #I:#W "
 
-# Disable things you don’t use
-[package]
-disabled = true
+##### PANE BORDERS #####
 
-[aws]
-disabled = true
+set -g pane-border-style "fg=#{@color_peri}"
+set -g pane-active-border-style "fg=#{@color_blue}"
 
-[gcloud]
-disabled = true
+##### KEYBINDINGS #####
 
-[docker_context]
-disabled = true
+# Switch prefix from C-b → C-a (much better)
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# Splits
+bind | split-window -h
+bind - split-window -v
+
+# Resize with vim keys
+bind -r h resize-pane -L 3
+bind -r j resize-pane -D 3
+bind -r k resize-pane -U 3
+bind -r l resize-pane -R 3
