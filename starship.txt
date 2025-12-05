@@ -1,16 +1,16 @@
-# ~/.tmux.conf — Bottom bar, smooth gradient feel, robust commands
+# ~/.tmux.conf - clean, arrow-gradient, no icons
+
 ##### GENERAL #####
 set -g history-limit 10000
 set -g mouse on
 setw -g mode-keys vi
 set -g default-terminal "tmux-256color"
 
-# Stop tmux renaming windows (prevents "0:zsh")
+# Prevent tmux renaming windows to shell name
 set -g allow-rename off
 set -g automatic-rename off
 
-##### COLORS (blue → violet palette) #####
-# We inline hex codes directly (tmux doesn't expand custom color vars in all places)
+##### COLORS (Blue → Purple gradient) #####
 BG="#1A1C2C"
 FG="#CCD6FF"
 C1="#3B5BDB"
@@ -20,6 +20,10 @@ C4="#748FFC"
 C5="#9775FA"
 C6="#B197FC"
 
+##### POWERLINE SEPARATORS #####
+SEP_RIGHT=""
+SEP_LEFT=""
+
 ##### STATUS BAR #####
 set -g status-position bottom
 set -g status-bg "$BG"
@@ -27,49 +31,50 @@ set -g status-fg "$FG"
 set -g status-interval 5
 set -g status-justify centre
 
-##### LEFT SIDE: Session | #Windows | CPU | MEM #####
-set -g status-left-length 220
+##### LEFT SIDE (session | windows | cpu | mem) #####
+set -g status-left-length 240
 set -g status-left "\
-#[bg=${C1},fg=${BG}]  #S  \
-#[fg=${C1},bg=${C2}] ▸ \
-#[bg=${C2},fg=${BG}] W:#(tmux list-windows -F '#I' | wc -l)  \
-#[fg=${C2},bg=${C3}] ▸ \
-#[bg=${C3},fg=${BG}] CPU: #(awk '/^cpu /{u=$2+$4; t=$2+$4+$5} END{if(t>0) printf \"%d%%\", u/t*100; else print \"N/A\"}' /proc/stat)  \
-#[fg=${C3},bg=${C4}] ▸ \
-#[bg=${C4},fg=${BG}] MEM: #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') \
-#[bg=${BG},fg=${FG}] "
+#[bg=$C1,fg=$BG] #S \
+#[fg=$C1,bg=$C2]$SEP_RIGHT\
+#[bg=$C2,fg=$BG] Windows: #(tmux list-windows | wc -l | tr -d ' ') \
+#[fg=$C2,bg=$C3]$SEP_RIGHT\
+#[bg=$C3,fg=$BG] CPU: #(awk '/^cpu /{u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", u/t*100; else print \"N/A\"}' /proc/stat) \
+#[fg=$C3,bg=$C4]$SEP_RIGHT\
+#[bg=$C4,fg=$BG] MEM: #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') \
+#[fg=$C4,bg=$BG]$SEP_RIGHT"
 
-##### RIGHT SIDE: Battery (robust) #####
-set -g status-right-length 80
+##### RIGHT SIDE (battery | date/time) #####
+set -g status-right-length 150
 set -g status-right "\
-#[fg=${C5},bg=${BG}] ▸ \
-#[bg=${C5},fg=${BG}] BAT: #( \
+#[fg=$C6,bg=$BG]$SEP_LEFT\
+#[bg=$C6,fg=$BG] BAT: #(\
   (command -v acpi >/dev/null 2>&1 && acpi -b 2>/dev/null | awk -F', ' '{print $2; exit}') || \
-  (for d in /sys/class/power_supply/*; do [ -f \"$d/capacity\" ] && cat \"$d/capacity\" && echo '%' && exit; done) || echo 'N/A' \
+  (for d in /sys/class/power_supply/*; do [ -f \"$d/capacity\" ] && cat \"$d/capacity\" && echo '%' && exit; done) || echo 'N/A'\
 ) \
-#[fg=${FG},bg=${BG}] "
+#[fg=$C5,bg=$C6]$SEP_LEFT\
+#[bg=$C5,fg=$BG] #(date '+%Y-%m-%d %H:%M') \
+#[fg=$BG,bg=$BG]"
 
 ##### WINDOW LIST #####
-setw -g window-status-format " #[fg=${FG}]#I:#W "
-setw -g window-status-current-format "#[bg=${C4},fg=${BG},bold] #I:#W "
+setw -g window-status-format " #[fg=$FG]#I:#W "
+setw -g window-status-current-format "#[bg=$C4,fg=$BG,bold] #I:#W "
 
 ##### PANE BORDERS #####
-set -g pane-border-style "fg=${C3}"
-set -g pane-active-border-style "fg=${C1}"
+set -g pane-border-style "fg=$C3"
+set -g pane-active-border-style "fg=$C1"
 
-##### KEYBINDINGS #####
-# Prefix = Ctrl+a
+##### KEYS #####
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
 
-# Pane movement with hjkl
+# Pane movement
 bind h select-pane -L
 bind j select-pane -D
 bind k select-pane -U
 bind l select-pane -R
 
-# Resize with SHIFT + hjkl
+# Resize with Shift + hjkl
 bind -r H resize-pane -L 5
 bind -r J resize-pane -D 5
 bind -r K resize-pane -U 5
@@ -79,5 +84,5 @@ bind -r L resize-pane -R 5
 bind | split-window -h
 bind - split-window -v
 
-# Reload config quickly
+# Reload config
 bind r source-file ~/.tmux.conf \; display-message "tmux reloaded"
