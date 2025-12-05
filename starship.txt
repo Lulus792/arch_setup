@@ -1,66 +1,71 @@
-##### GENERAL #####
-set -g history-limit 10000
+##### BASIC #####
+set -g history-limit 5000
 set -g mouse on
 setw -g mode-keys vi
 set -g default-terminal "tmux-256color"
 
-##### COLORS #####
-set -g @grad1 "#3B5BDB"   # deep blue
-set -g @grad2 "#4C6EF5"   # medium blue
-set -g @grad3 "#5C7CFA"   # light blue
-set -g @grad4 "#748FFC"   # periwinkle
-set -g @grad5 "#9775FA"   # lavender
-set -g @grad6 "#B197FC"   # soft purple
+##### COLORS (Blue → Purple gradient) #####
+c1="#3B5BDB"
+c2="#4C6EF5"
+c3="#5C7CFA"
+c4="#748FFC"
+c5="#9775FA"
+c6="#B197FC"
 
-BG="#1A1C2C"
-FG="#CCD6FF"
+bg="#1A1C2C"
+fg="#CCD6FF"
+
+##### POWERLINE SEPARATORS #####
+separator_left=""
+separator_right=""
 
 ##### STATUS BAR #####
-#set -g status-position top
-set -g status-bg "$BG"
-set -g status-fg "$FG"
+set -g status-position top
 set -g status-interval 5
-set -g status-justify centre
+set -g status-bg "$bg"
+set -g status-fg "$fg"
 
-##### LEFT SIDE (gradient) #####
-
+##### LEFT SIDE (gradient arrows smooth) #####
 set -g status-left-length 200
 set -g status-left "\
-#[bg=#3B5BDB,fg=$BG]  #S  \
-#[bg=#4C6EF5,fg=$BG]   #(awk '{u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", (u/t*100); else printf \"N/A\"}' /proc/stat)  \
-#[bg=#5C7CFA,fg=$BG]   #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}')  \
-#[bg=$BG,fg=$FG] "
+#[bg=$c1,fg=$bg] #S \
+#[fg=$c1,bg=$c2]$separator_left\
+#[bg=$c2,fg=$bg] 🧠 #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') \
+#[fg=$c2,bg=$c3]$separator_left\
+#[bg=$c3,fg=$bg] CPU #(awk '/cpu /{u=$2+$4; t=$2+$4+$5} END {printf \"%d%%\", u/t * 100}' /proc/stat) \
+#[fg=$c3,bg=$bg]$separator_left "
 
-##### RIGHT SIDE (battery + gradient) #####
-
+##### RIGHT SIDE (BATTERY + gradient) #####
 set -g status-right-length 200
 set -g status-right "\
-#[bg=#9775FA,fg=$BG] 🔋 #( (acpi -b 2>/dev/null | awk -F', ' '{print $2}') || echo 'N/A') \
-#[bg=#B197FC,fg=$BG]  \
-#[fg=$FG,bg=$BG] "
+#[fg=$c5,bg=$bg]$separator_right\
+#[bg=$c5,fg=$bg] 🔋 #(acpi -b 2>/dev/null | awk -F', ' '{print $2}' | head -n1) \
+#[fg=$c6,bg=$c5]$separator_right\
+#[bg=$c6,fg=$bg] #(date +'%H:%M') \
+"
 
-##### WINDOW LIST #####
-setw -g window-status-format " #I:#W "
-setw -g window-status-current-format "#[fg=#748FFC,bold] #I:#W "
+##### WINDOW TABS #####
+setw -g window-status-format "#[fg=$fg] #I:#W "
+setw -g window-status-current-format "#[bg=$c4,fg=$bg] #I:#W "
 
 ##### PANE BORDERS #####
-set -g pane-border-style "fg=#5C7CFA"
-set -g pane-active-border-style "fg=#4C6EF5"
+set -g pane-border-style "fg=$c3"
+set -g pane-active-border-style "fg=$c1"
 
-##### KEYBINDINGS #####
+##### KEYBINDS #####
 
-# tmux prefix = CTRL+A
+# Use CTRL+A as prefix
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
 
-# Move panes (hjkl)
+# Move between panes
 bind h select-pane -L
 bind j select-pane -D
 bind k select-pane -U
 bind l select-pane -R
 
-# Resize with Shift + hjkl
+# Resize with Shift-HJKL
 bind -r H resize-pane -L 5
 bind -r J resize-pane -D 5
 bind -r K resize-pane -U 5
