@@ -5,51 +5,51 @@ setw -g mode-keys vi
 set -g default-terminal "tmux-256color"
 
 ##### COLORS #####
-set -g @color_bg  "#1A1C2C"
-set -g @color_fg  "#CCD6FF"
+set -g @grad1 "#3B5BDB"   # deep blue
+set -g @grad2 "#4C6EF5"   # medium blue
+set -g @grad3 "#5C7CFA"   # light blue
+set -g @grad4 "#748FFC"   # periwinkle
+set -g @grad5 "#9775FA"   # lavender
+set -g @grad6 "#B197FC"   # soft purple
 
-# Gradient colors
-set -g @grad1 "#3B5BDB"
-set -g @grad2 "#4C6EF5"
-set -g @grad3 "#5C7CFA"
-set -g @grad4 "#748FFC"
-set -g @grad5 "#9775FA"
-set -g @grad6 "#B197FC"
+BG="#1A1C2C"
+FG="#CCD6FF"
 
 ##### STATUS BAR #####
 #set -g status-position top
-set -g status-bg "#{@color_bg}"
-set -g status-fg "#{@color_fg}"
+set -g status-bg "$BG"
+set -g status-fg "$FG"
 set -g status-interval 5
 set -g status-justify centre
 
-##### LEFT SIDE (Gradient segments + Session + CPU & MEM) #####
+##### LEFT SIDE (gradient) #####
 
 set -g status-left-length 200
 set -g status-left "\
-#[bg=#{@grad1},fg=#{@color_bg}]  #S  \
-#[bg=#{@grad2},fg=#{@color_bg}]   #(awk '{u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", (u/t*100); else printf \"N/A\"}' /proc/stat)  \
-#[bg=#{@grad3},fg=#{@color_bg}]   #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}')  \
-#[bg=#{@color_bg}] "
+#[bg=#3B5BDB,fg=$BG]  #S  \
+#[bg=#4C6EF5,fg=$BG]   #(awk '{u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", (u/t*100); else printf \"N/A\"}' /proc/stat)  \
+#[bg=#5C7CFA,fg=$BG]   #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}')  \
+#[bg=$BG,fg=$FG] "
 
-##### RIGHT SIDE (Battery + Gradient) #####
+##### RIGHT SIDE (battery + gradient) #####
 
 set -g status-right-length 200
 set -g status-right "\
-#[bg=#{@grad5},fg=#{@color_bg}] 🔋 #( (acpi -b 2>/dev/null | awk -F', ' '{print $2}') || echo 'N/A')  \
-#[bg=#{@grad6},fg=#{@color_bg}]  \
-#[fg=#{@color_fg},bg=#{@color_bg}] "
+#[bg=#9775FA,fg=$BG] 🔋 #( (acpi -b 2>/dev/null | awk -F', ' '{print $2}') || echo 'N/A') \
+#[bg=#B197FC,fg=$BG]  \
+#[fg=$FG,bg=$BG] "
 
 ##### WINDOW LIST #####
 setw -g window-status-format " #I:#W "
-setw -g window-status-current-format "#[fg=#{@grad4},bold] #I:#W "
+setw -g window-status-current-format "#[fg=#748FFC,bold] #I:#W "
 
 ##### PANE BORDERS #####
-set -g pane-border-style "fg=#{@grad3}"
-set -g pane-active-border-style "fg=#{@grad2}"
+set -g pane-border-style "fg=#5C7CFA"
+set -g pane-active-border-style "fg=#4C6EF5"
 
 ##### KEYBINDINGS #####
 
+# tmux prefix = CTRL+A
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
