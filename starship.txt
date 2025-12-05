@@ -41,7 +41,7 @@ set -g status-left "\
 #[bg=$C4,fg=$BG] MEM: #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') \
 #[fg=$C4,bg=$BG]$SEP_RIGHT"
 
-##### RIGHT SIDE (battery | date/time) #####
+##### RIGHT SIDE (battery | DATE ONLY) #####
 set -g status-right-length 150
 set -g status-right "\
 #[fg=$C6,bg=$BG]$SEP_LEFT\
@@ -50,4 +50,40 @@ set -g status-right "\
   (for d in /sys/class/power_supply/*; do [ -f \"$d/capacity\" ] && cat \"$d/capacity\" && echo '%' && exit; done) || echo 'N/A'\
 ) \
 #[fg=$C5,bg=$C6]$SEP_LEFT\
-#[bg=$C5]()
+#[bg=$C5,fg=$BG] #(date '+%Y-%m-%d') \
+#[fg=$BG,bg=$BG]"
+
+##### WINDOW LIST (CENTER SECTION, FIXED COLOR) #####
+setw -g window-status-style "bg=$BG,fg=$FG"
+setw -g window-status-current-style "bg=$BG,fg=$C4,bold"
+
+setw -g window-status-format " #[fg=$FG]#I:#W "
+setw -g window-status-current-format " #[fg=$C4,bold]#I:#W "
+
+##### PANE BORDERS #####
+set -g pane-border-style "fg=$C3"
+set -g pane-active-border-style "fg=$C1"
+
+##### KEYS #####
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# Pane movement
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Resize with Shift + hjkl
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# Splits
+bind | split-window -h
+bind - split-window -v
+
+# Reload config
+bind r source-file ~/.tmux.conf \; display-message "tmux reloaded"
