@@ -1,4 +1,4 @@
-# ~/.tmux.conf - clean, arrow-gradient, no icons
+# ~/.tmux.conf - fixed middle, dynamic status position, date + loadavg right side
 
 ##### GENERAL #####
 set -g history-limit 10000
@@ -25,6 +25,7 @@ SEP_RIGHT=""
 SEP_LEFT=""
 
 ##### STATUS BAR #####
+# Default position is bottom; we will toggle dynamically via hooks
 set -g status-position bottom
 set -g status-bg "$BG"
 set -g status-fg "$FG"
@@ -38,21 +39,27 @@ set -g status-left "\
 #[fg=$C1,bg=$C2]$SEP_RIGHT\
 #[bg=$C2,fg=$BG] Windows: #(tmux list-windows | wc -l | tr -d ' ') \
 #[fg=$C2,bg=$C3]$SEP_RIGHT\
-#[bg=$C3,fg=$BG] CPU: #(awk '/^cpu /{u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", u/t*100; else print \"N/A\"}' /proc/stat) \
+#[bg=$C3,fg=$BG] CPU: #( \
+  awk '/^cpu / {u=$2+$4; t=$2+$4+$5} END {if(t>0) printf \"%d%%\", u/t*100; else print \"N/A\"}' /proc/stat \
+) \
 #[fg=$C3,bg=$C4]$SEP_RIGHT\
-#[bg=$C4,fg=$BG] MEM: #(free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100}') \
+#[bg=$C4,fg=$BG] MEM: #( \
+  free -m | awk '/Mem/ {printf \"%d%%\", $3/$2 * 100} \
+)' \
 #[fg=$C4,bg=$BG]$SEP_RIGHT"
 
-##### RIGHT SIDE (battery | date/time) #####
+##### RIGHT SIDE (battery | date | load average) #####
 set -g status-right-length 150
 set -g status-right "\
 #[fg=$C6,bg=$BG]$SEP_LEFT\
-#[bg=$C6,fg=$BG] BAT: #(\
+#[bg=$C6,fg=$BG] BAT: #( \
   (command -v acpi >/dev/null 2>&1 && acpi -b 2>/dev/null | awk -F', ' '{print $2; exit}') || \
-  (for d in /sys/class/power_supply/*; do [ -f \"$d/capacity\" ] && cat \"$d/capacity\" && echo '%' && exit; done) || echo 'N/A'\
+  (for d in /sys/class/power_supply/*; do [ -f \"$d/capacity\" ] && cat \"$d/capacity\" && echo '%' && exit; done) || echo 'N/A' \
 ) \
 #[fg=$C5,bg=$C6]$SEP_LEFT\
-#[bg=$C5,fg=$BG] #(date '+%Y-%m-%d %H:%M') \
+#[bg=$C5,fg=$BG] #(date '+%Y-%m-%d') \
+#[fg=$C4,bg=$C5]$SEP_LEFT\
+#[bg=$C4,fg=$BG] Load: #(uptime | awk -F 'load average:' '{ print $2 }' | cut -d, -f1-3 | tr -d ' ') \
 #[fg=$BG,bg=$BG]"
 
 ##### WINDOW LIST #####
@@ -86,3 +93,21 @@ bind - split-window -v
 
 # Reload config
 bind r source-file ~/.tmux.conf \; display-message "tmux reloaded"
+
+##### DYNAMIC STATUS POSITION FOR NVIM #####
+# This hook checks if current pane runs nvim, if yes set status bar top, else bottom
+
+run-shell -b 'tmux set-hook -g pane-focus-in "run-shell '\''\
+if tmux list-panes -F \"#{pane_active} #{pane_current_command}\" | grep -q \"^1 nvim\$\"; then \
+  tmux set-option -g status-position top; \
+else \
+  tmux set-option -g status-position bottom; \
+fi"'\'' '
+
+# Also check when switching windows
+run-shell -b 'tmux set-hook -g window-pane-changed "run-shell '\''\
+if tmux list-panes -F \"#{pane_active} #{pane_current_command}\" | grep -q \"^1 nvim\$\"; then \
+  tmux set-option -g status-position top; \
+else \
+  tmux set-option -g status-position bottom; \
+fi"'\'' '
