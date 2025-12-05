@@ -18,6 +18,10 @@ C4="#748FFC"
 C5="#9775FA"
 C6="#B197FC"
 
+# Special blue for tmux prompt/menus (distinct from regular BG)
+POPUP_BG="#2F4CFF"   # pretty, bright, distinguishable blue
+POPUP_FG="#1A1C2C"   # dark text for contrast
+
 ##### POWERLINE SEPARATORS #####
 SEP_RIGHT=""
 SEP_LEFT=""
@@ -59,6 +63,12 @@ setw -g window-status-current-style "bg=$BG,fg=$C4,bold"
 
 setw -g window-status-format " #[fg=$FG]#I:#W "
 setw -g window-status-current-format " #[fg=$C4,bold]#I:#W "
+
+##### TMUX PROMPT / CONFIRMATION / SEARCH BAR COLORS #####
+# This is the bar that turns yellow by default (kill-pane prompt, command prompt, messages)
+set -g message-style "bg=$POPUP_BG,fg=$POPUP_FG"
+set -g message-command-style "bg=$POPUP_BG,fg=$POPUP_FG"
+setw -g mode-style "bg=$POPUP_BG,fg=$POPUP_FG"
 
 ##### PANE BORDERS #####
 set -g pane-border-style "fg=$C3"
