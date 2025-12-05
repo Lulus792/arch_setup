@@ -55,6 +55,13 @@ set -g status-right "\
 #[bg=$C5,fg=$BG] #(date '+%Y-%m-%d %H:%M') \
 #[fg=$BG,bg=$BG]"
 
+##### CENTER SECTION #####
+# Use status-format to define middle explicitly
+set -g status-format[0] "\
+#[align=centre,bg=$BG,fg=$FG] #{?pane_active,#[bold],}#{pane_current_command}#{?pane_active,#[nobold],} \
+"
+
+
 ##### WINDOW LIST #####
 setw -g window-status-format " #[fg=$FG]#I:#W "
 setw -g window-status-current-format "#[bg=$C4,fg=$BG,bold] #I:#W "
